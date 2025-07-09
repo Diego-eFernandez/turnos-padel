@@ -1,0 +1,267 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #1b1a63; /* Verde Pádel */
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+}
+
+header p {
+    margin-top: 5px;
+    font-size: 1.1em;
+}
+
+main {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.turnos-dia {
+    margin-bottom: 30px;
+}
+
+.turnos-dia h2 {
+    color: #333;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.turnos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 3 columnas aprox */
+    gap: 20px;
+}
+
+.turno-item {
+    background-color: #e0ffe0; /* Fondo verde claro para disponible */
+    border: 1px solid #c8ecc8;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.turno-item.ocupado {
+    background-color: #ffe0e0; /* Fondo rojo claro para ocupado */
+    border: 1px solid #ecc8c8;
+    color: #666;
+}
+
+.turno-item.ocupado .reservar-btn {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.turno-item .hora {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #2e7d32; /* Verde más oscuro */
+    margin-bottom: 5px;
+}
+
+.turno-item.ocupado .hora {
+    color: #b71c1c; /* Rojo más oscuro */
+}
+
+.turno-item .precio {
+    font-size: 1.2em;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.reservar-btn {
+    background-color: #28a745; /* Botón verde */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.reservar-btn:hover {
+    background-color: #218838;
+}
+
+.turno-item.ocupado .reservar-btn:hover {
+    background-color: #ccc; /* No cambia al pasar el mouse si está ocupado */
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+    background-color: #333;
+    color: white;
+    font-size: 0.9em;
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+/* --- Media Queries para Responsiveness --- */
+
+/* Para pantallas más pequeñas (tablets y celulares en modo horizontal) */
+@media (max-width: 768px) {
+    .turnos-grid {
+        /* En pantallas de hasta 768px, mostraremos 2 columnas */
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px; /* Reducimos un poco el espacio entre elementos */
+    }
+
+    .turno-item {
+        padding: 12px; /* Reducimos un poco el padding */
+    }
+
+    .reservar-btn {
+        padding: 8px 12px; /* Botones un poco más pequeños */
+        font-size: 0.9em;
+    }
+
+    header h1 {
+        font-size: 2em; /* Título un poco más pequeño */
+    }
+
+    header p {
+        font-size: 1em;
+    }
+
+    main {
+        padding: 15px; /* Reducimos el padding general de la sección principal */
+        margin: 15px auto;
+    }
+}
+
+/* Para pantallas de celulares (vertical) */
+@media (max-width: 480px) {
+    .turnos-grid {
+        /* En celulares, los turnos se mostrarán en una sola columna */
+        grid-template-columns: 1fr;
+        gap: 10px; /* Más compacto */
+    }
+
+    .turno-item {
+        flex-direction: row; /* Hacemos que los elementos se organicen en fila */
+        align-items: center; /* Alineamos verticalmente */
+        justify-content: space-between; /* Espaciamos los elementos */
+        padding: 10px 15px;
+    }
+
+    .turno-item .hora,
+    .turno-item .precio {
+        margin-bottom: 0; /* Quitamos el margen inferior para que se alineen */
+        font-size: 1.1em; /* Ajustamos el tamaño de fuente */
+    }
+
+    .turno-item .precio {
+        text-align: right; /* Alineamos el precio a la derecha */
+        min-width: 70px; /* Para asegurar que el precio tenga espacio */
+    }
+
+    .reservar-btn {
+        width: auto; /* El botón se ajusta al contenido */
+        white-space: nowrap; /* Evita que el texto del botón se rompa */
+        padding: 6px 10px;
+        font-size: 0.85em;
+    }
+
+    header h1 {
+        font-size: 1.8em;
+    }
+
+    header p {
+        font-size: 0.9em;
+    }
+
+    h2 { /* Títulos de los días */
+        font-size: 1.5em;
+    }
+}
+/* Estilos para la navegación de días */
+.day-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 15px 20px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.day-navigation button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.day-navigation button:hover {
+    background-color: #0056b3;
+}
+
+.day-navigation button:active {
+    background-color: #004085;
+}
+
+#currentDayDisplay { /* El span que muestra la fecha del día */
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    text-align: center; /* Centrar el texto */
+    flex-grow: 1; /* Para que ocupe el espacio central */
+}
+
+/* Ajustes para pantallas pequeñas en la navegación de días */
+@media (max-width: 480px) {
+    .day-navigation {
+        flex-direction: column; /* Apilar botones y texto en columnas */
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .day-navigation button {
+        width: 100%; /* Botones ocupan todo el ancho */
+        padding: 10px 15px;
+        font-size: 0.9em;
+    }
+
+    #currentDayDisplay {
+        font-size: 1em;
+    }
+}
+.turnos-dia {
+    display: none; /* Oculta todos los días por defecto */
+    margin-bottom: 30px; /* Espacio entre secciones de día (aunque solo una será visible) */
+}
+
+.turnos-dia.active {
+    display: block; /* Muestra solo el día que tenga la clase 'active' */
+}
