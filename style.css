@@ -265,3 +265,57 @@ footer p {
 .turnos-dia.active {
     display: block; /* Muestra solo el día que tenga la clase 'active' */
 }
+
+header .header-content {
+    display: flex; /* Para alinear logo y título horizontalmente */
+    align-items: center; /* Centrar verticalmente los elementos */
+    margin-bottom: 10px; /* Espacio entre el logo/título y el párrafo */
+}
+
+.logo {
+    height: 50px; /* Ajusta la altura del logo según necesites */
+    margin-right: 15px; /* Espacio entre el logo y el título */
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.2em; /* Un poco más pequeño que antes */
+}
+
+header p {
+    font-size: 1.1em;
+    color: #555;
+    margin-top: 5px;
+}
+
+/* Ajustes para pantallas más pequeñas (max-width: 600px) */
+@media (max-width: 600px) {
+    header .header-content {
+        flex-direction: column; /* Apilar logo y título verticalmente */
+        text-align: center; /* Centrar el texto */
+        margin-bottom: 15px;
+    }
+
+    .logo {
+        height: 70px; /* Hacer el logo un poco más grande en móviles */
+        margin: 0 auto 10px; /* Centrar horizontalmente y añadir margen inferior */
+    }
+
+    header h1 {
+        font-size: 1.8em; /* Título más pequeño en móviles */
+    }
+
+    header p {
+        font-size: 1em;
+    }
+}
+/* Ajustes para pantallas aún más pequeñas (max-width: 400px) */
+@media (max-width: 400px) {
+    .logo {
+        height: 60px; /* Ajustar un poco más el tamaño del logo */
+    }
+
+    header h1 {
+        font-size: 1.6em;
+    }
+}
