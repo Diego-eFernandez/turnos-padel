@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const whatsappNumero = "5492346123456"; // Tu número de WhatsApp con código de país sin el +
+    const whatsappNumero = "5492346525248"; // Tu número de WhatsApp con código de país sin el +
 
     let currentDisplayDate = new Date(); // Variable para la fecha del día que se está mostrando
     let turnosSemanaData = {}; // Variable para almacenar los datos de los turnos del JSON
