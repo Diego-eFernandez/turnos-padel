@@ -67,7 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Si los datos del JSON no se han cargado, los cargamos una sola vez
         if (Object.keys(turnosSemanaData).length === 0) {
             try {
-                const response = await fetch('turnos.json');
+                const timestamp = new Date().getTime(); // Genera un número único basado en la hora actual
+                const response = await fetch(`turnos.json?v=${timestamp}`); // Añade el timestamp como parámetro
                 turnosSemanaData = await response.json();
             } catch (error) {
                 console.error('Error al cargar los turnos desde turnos.json:', error);

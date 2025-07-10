@@ -71,7 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Cargar los turnos desde turnos.json si aún no se han cargado
         if (Object.keys(turnosDataEditable).length === 0) {
             try {
-                const response = await fetch('turnos.json');
+                const timestamp = new Date().getTime(); // Genera un número único basado en la hora actual
+                const response = await fetch(`turnos.json?v=${timestamp}`); // Añade el timestamp como parámetro
                 const originalData = await response.json();
                 turnosDataEditable = JSON.parse(JSON.stringify(originalData)); // Hacemos una copia profunda
             } catch (error) {
