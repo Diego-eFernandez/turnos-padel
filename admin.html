@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Turnos - Cancha de Pádel</title>
+    <link rel="stylesheet" href="style.css"> <style>
+        /* Estilos específicos para la página de administración */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .admin-header h1 {
+            font-size: 2em;
+            color: #1b1a63;
+            margin: 0;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .admin-button {
+            background-color: #28a745; /* Verde para Guardar */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .admin-button:hover {
+            background-color: #218838;
+        }
+
+        .turnos-dia h2 {
+            font-size: 1.8em;
+            color: #1b1a63;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .turno-item {
+            cursor: pointer; /* Indica que se puede hacer clic */
+            transition: background-color 0.2s ease;
+        }
+
+        .turno-item.disponible {
+            background-color: #e6ffe6; /* Fondo verde claro */
+            border-left: 5px solid #28a745;
+        }
+
+        .turno-item.ocupado {
+            background-color: #ffe6e6; /* Fondo rojo claro */
+            border-left: 5px solid #dc3545;
+        }
+
+        /* Estilos para el estado del botón en la administración */
+        .turno-item .reservar-btn {
+            pointer-events: none; /* Deshabilita el click en el botón en admin */
+            opacity: 0.7; /* Lo hacemos un poco transparente */
+        }
+
+        .turno-item.disponible .reservar-btn {
+            background-color: #28a745; /* Botón verde */
+        }
+
+        .turno-item.ocupado .reservar-btn {
+            background-color: #dc3545; /* Botón rojo */
+        }
+
+        /* Media Queries para responsividad */
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .admin-header h1 {
+                font-size: 1.8em;
+            }
+            .admin-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            .admin-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="admin-header">
+            <h1>Administrar Turnos</h1>
+            <div class="admin-actions">
+                <button id="saveChangesBtn" class="admin-button">Guardar Cambios (Descargar JSON)</button>
+                <button id="resetChangesBtn" class="admin-button" style="background-color: #ffc107; color: #333;">Descartar Cambios</button>
+            </div>
+        </div>
+
+        <div class="day-navigation">
+            <button id="prevDayBtn">← Día Anterior</button>
+            <span id="currentDayDisplay"></span>
+            <button id="nextDayBtn">Próximo Día →</button>
+        </div>
+
+        <div id="admin-turnos-container">
+            </div>
+    </main>
+
+    <script src="admin-script.js"></script>
+</body>
+</html>
+
