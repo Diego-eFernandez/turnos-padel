@@ -1,93 +1,401 @@
 {
-     "lunes": [
-      { "hora": "07:30 - 09:00", "precio": 3000, "disponible": true },
-      { "hora": "09:00 - 10:30", "precio": 3000, "disponible": true },
-      { "hora": "10:30 - 12:00", "precio": 3000, "disponible": true },
-      { "hora": "12:00 - 13:30", "precio": 6000, "disponible": true },
-      { "hora": "13:30 - 15:00", "precio": 6000, "disponible": false },
-      { "hora": "15:00 - 16:30", "precio": 6000, "disponible": false },
-      { "hora": "16:30 - 18:00", "precio": 6000, "disponible": true },
-      { "hora": "18:00 - 19:30", "precio": 6000, "disponible": false },
-      { "hora": "19:30 - 21:00", "precio": 6000, "disponible": true },
-      { "hora": "21:00 - 22:30", "precio": 6000, "disponible": false },
-      { "hora": "22:30 - 00:00", "precio": 4000, "disponible": true }
+    "lunes": [
+        {
+            "hora": "07:30 - 09:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "09:00 - 10:30",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "10:30 - 12:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "12:00 - 13:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "13:30 - 15:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "15:00 - 16:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "16:30 - 18:00",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "18:00 - 19:30",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "19:30 - 21:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "21:00 - 22:30",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "22:30 - 00:00",
+            "precio": 4000,
+            "disponible": false
+        }
     ],
     "martes": [
-      { "hora": "07:30 - 09:00", "precio": 3000, "disponible": true },
-      { "hora": "09:00 - 10:30", "precio": 3000, "disponible": true },
-      { "hora": "10:30 - 12:00", "precio": 3000, "disponible": true },
-      { "hora": "12:00 - 13:30", "precio": 6000, "disponible": false },
-      { "hora": "13:30 - 15:00", "precio": 6000, "disponible": false},
-      { "hora": "15:00 - 16:30", "precio": 6000, "disponible": true },
-      { "hora": "16:30 - 18:00", "precio": 6000, "disponible": true },
-      { "hora": "18:00 - 19:30", "precio": 6000, "disponible": true },
-      { "hora": "19:30 - 21:00", "precio": 6000, "disponible": true },
-      { "hora": "21:00 - 22:30", "precio": 6000, "disponible": true },
-      { "hora": "22:30 - 00:00", "precio": 4000, "disponible": false}
+        {
+            "hora": "07:30 - 09:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "09:00 - 10:30",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "10:30 - 12:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "12:00 - 13:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "13:30 - 15:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "15:00 - 16:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "16:30 - 18:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "18:00 - 19:30",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "19:30 - 21:00",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "21:00 - 22:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "22:30 - 00:00",
+            "precio": 4000,
+            "disponible": true
+        }
     ],
     "miercoles": [
-      { "hora": "07:30 - 09:00", "precio": 3000, "disponible": true },
-      { "hora": "09:00 - 10:30", "precio": 3000, "disponible": false},
-      { "hora": "10:30 - 12:00", "precio": 3000, "disponible": true },
-      { "hora": "12:00 - 13:30", "precio": 6000, "disponible": true },
-      { "hora": "13:30 - 15:00", "precio": 6000, "disponible": true },
-      { "hora": "15:00 - 16:30", "precio": 6000, "disponible": true },
-      { "hora": "16:30 - 18:00", "precio": 6000, "disponible": true },
-      { "hora": "18:00 - 19:30", "precio": 6000, "disponible": true },
-      { "hora": "19:30 - 21:00", "precio": 6000, "disponible": false},
-      { "hora": "21:00 - 22:30", "precio": 6000, "disponible": true },
-      { "hora": "22:30 - 00:00", "precio": 4000, "disponible": true }
+        {
+            "hora": "07:30 - 09:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "09:00 - 10:30",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "10:30 - 12:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "12:00 - 13:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "13:30 - 15:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "15:00 - 16:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "16:30 - 18:00",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "18:00 - 19:30",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "19:30 - 21:00",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "21:00 - 22:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "22:30 - 00:00",
+            "precio": 4000,
+            "disponible": false
+        }
     ],
     "jueves": [
-      { "hora": "07:30 - 09:00", "precio": 3000, "disponible": true },
-      { "hora": "09:00 - 10:30", "precio": 3000, "disponible": true },
-      { "hora": "10:30 - 12:00", "precio": 3000, "disponible": true },
-      { "hora": "12:00 - 13:30", "precio": 6000, "disponible": false},
-      { "hora": "13:30 - 15:00", "precio": 6000, "disponible": true },
-      { "hora": "15:00 - 16:30", "precio": 6000, "disponible": false},
-      { "hora": "16:30 - 18:00", "precio": 6000, "disponible": false},
-      { "hora": "18:00 - 19:30", "precio": 6000, "disponible": false},
-      { "hora": "19:30 - 21:00", "precio": 6000, "disponible": false},
-      { "hora": "21:00 - 22:30", "precio": 6000, "disponible": true },
-      { "hora": "22:30 - 00:00", "precio": 4000, "disponible": true }
+        {
+            "hora": "07:30 - 09:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "09:00 - 10:30",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "10:30 - 12:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "12:00 - 13:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "13:30 - 15:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "15:00 - 16:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "16:30 - 18:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "18:00 - 19:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "19:30 - 21:00",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "21:00 - 22:30",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "22:30 - 00:00",
+            "precio": 4000,
+            "disponible": true
+        }
     ],
     "viernes": [
-      { "hora": "07:30 - 09:00", "precio": 3000, "disponible": true },
-      { "hora": "09:00 - 10:30", "precio": 3000, "disponible": true },
-      { "hora": "10:30 - 12:00", "precio": 3000, "disponible": true },
-      { "hora": "12:00 - 13:30", "precio": 6000, "disponible": true },
-      { "hora": "13:30 - 15:00", "precio": 6000, "disponible": true },
-      { "hora": "15:00 - 16:30", "precio": 6000, "disponible": true },
-      { "hora": "16:30 - 18:00", "precio": 6000, "disponible": true },
-      { "hora": "18:00 - 19:30", "precio": 6000, "disponible": true },
-      { "hora": "19:30 - 21:00", "precio": 6000, "disponible": true },
-      { "hora": "21:00 - 22:30", "precio": 6000, "disponible": true },
-      { "hora": "22:30 - 00:00", "precio": 4000, "disponible": true }
+        {
+            "hora": "07:30 - 09:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "09:00 - 10:30",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "10:30 - 12:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "12:00 - 13:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "13:30 - 15:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "15:00 - 16:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "16:30 - 18:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "18:00 - 19:30",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "19:30 - 21:00",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "21:00 - 22:30",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "22:30 - 00:00",
+            "precio": 4000,
+            "disponible": true
+        }
     ],
     "sabado": [
-      { "hora": "07:30 - 09:00", "precio": 3000, "disponible": false },
-      { "hora": "09:00 - 10:30", "precio": 3000, "disponible": false },
-      { "hora": "10:30 - 12:00", "precio": 3000, "disponible": false },
-      { "hora": "12:00 - 13:30", "precio": 6000, "disponible": false },
-      { "hora": "13:30 - 15:00", "precio": 6000, "disponible": false },
-      { "hora": "15:00 - 16:30", "precio": 6000, "disponible": false },
-      { "hora": "16:30 - 18:00", "precio": 6000, "disponible": false },
-      { "hora": "18:00 - 19:30", "precio": 6000, "disponible": false },
-      { "hora": "19:30 - 21:00", "precio": 6000, "disponible": false },
-      { "hora": "21:00 - 22:30", "precio": 6000, "disponible": false },
-      { "hora": "22:30 - 00:00", "precio": 4000, "disponible": false }
+        {
+            "hora": "07:30 - 09:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "09:00 - 10:30",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "10:30 - 12:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "12:00 - 13:30",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "13:30 - 15:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "15:00 - 16:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "16:30 - 18:00",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "18:00 - 19:30",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "19:30 - 21:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "21:00 - 22:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "22:30 - 00:00",
+            "precio": 4000,
+            "disponible": true
+        }
     ],
     "domingo": [
-      { "hora": "07:30 - 09:00", "precio": 3000, "disponible": false },
-      { "hora": "09:00 - 10:30", "precio": 3000, "disponible": false },
-      { "hora": "10:30 - 12:00", "precio": 3000, "disponible": false },
-      { "hora": "12:00 - 13:30", "precio": 6000, "disponible": false },
-      { "hora": "13:30 - 15:00", "precio": 6000, "disponible": false },
-      { "hora": "15:00 - 16:30", "precio": 6000, "disponible": false },
-      { "hora": "16:30 - 18:00", "precio": 6000, "disponible": false },
-      { "hora": "18:00 - 19:30", "precio": 6000, "disponible": false },
-      { "hora": "19:30 - 21:00", "precio": 6000, "disponible": false },
-      { "hora": "21:00 - 22:30", "precio": 6000, "disponible": false },
-      { "hora": "22:30 - 00:00", "precio": 4000, "disponible": false }
+        {
+            "hora": "07:30 - 09:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "09:00 - 10:30",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "10:30 - 12:00",
+            "precio": 3000,
+            "disponible": true
+        },
+        {
+            "hora": "12:00 - 13:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "13:30 - 15:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "15:00 - 16:30",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "16:30 - 18:00",
+            "precio": 6000,
+            "disponible": true
+        },
+        {
+            "hora": "18:00 - 19:30",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "19:30 - 21:00",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "21:00 - 22:30",
+            "precio": 6000,
+            "disponible": false
+        },
+        {
+            "hora": "22:30 - 00:00",
+            "precio": 4000,
+            "disponible": true
+        }
     ]
-  }
+}
