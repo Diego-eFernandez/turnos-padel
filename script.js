@@ -116,8 +116,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event Listeners para los botones de navegación de días
     prevDayBtn.addEventListener('click', () => {
-        currentDisplayDate.setDate(currentDisplayDate.getDate() - 1); // Restar 1 día
-        cargarYMostrarTurnosDelDia();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Establecer a inicio del día para comparación
+    
+        const newDate = new Date(currentDisplayDate);
+        newDate.setDate(newDate.getDate() - 1);
+        newDate.setHours(0, 0, 0, 0); // Establecer a inicio del día para comparación
+    
+        // Solo permitir ir al día anterior si no es antes de hoy
+        if (newDate.getTime() >= today.getTime()) {
+            currentDisplayDate.setDate(currentDisplayDate.getDate() - 1);
+            cargarYMostrarTurnosDelDia();
+        } else {
+            alert('No puedes ver turnos de días pasados.');
+        }
     });
 
     nextDayBtn.addEventListener('click', () => {
