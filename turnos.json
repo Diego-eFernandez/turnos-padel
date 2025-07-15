@@ -75,12 +75,12 @@
         {
             "hora": "12:00 - 13:30",
             "precio": 6000,
-            "disponible": true
+            "disponible": false
         },
         {
             "hora": "13:30 - 15:00",
             "precio": 6000,
-            "disponible": true
+            "disponible": false
         },
         {
             "hora": "15:00 - 16:30",
