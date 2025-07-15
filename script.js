@@ -133,8 +133,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     nextDayBtn.addEventListener('click', () => {
-        currentDisplayDate.setDate(currentDisplayDate.getDate() + 1); // Sumar 1 día
-        cargarYMostrarTurnosDelDia();
+        const limitDate = new Date();
+        limitDate.setDate(limitDate.getDate() + 6); // Hoy + 6 días = 7 días en total
+        limitDate.setHours(0, 0, 0, 0); // Establecer a inicio del día para comparación
+    
+        const newDate = new Date(currentDisplayDate);
+        newDate.setDate(newDate.getDate() + 1);
+        newDate.setHours(0, 0, 0, 0); // Establecer a inicio del día para comparación
+    
+        // Solo permitir ir al día siguiente si no excede el límite de 7 días
+        if (newDate.getTime() <= limitDate.getTime()) {
+            currentDisplayDate.setDate(currentDisplayDate.getDate() + 1);
+            cargarYMostrarTurnosDelDia();
+        } else {
+            alert('Solo puedes ver los turnos para los próximos 7 días.');
+        }
     });
 
     // Cargar los turnos del día inicial al cargar la página
