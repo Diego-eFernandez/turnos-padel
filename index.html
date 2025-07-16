@@ -15,48 +15,16 @@
         <p>¡Consultá nuestros horarios y reservá tu cancha!</p>
     </header>
     
-        <main>
-            <div class="day-navigation">
-                <button id="prevDayBtn">← Día Anterior</button>
-                <span id="currentDayDisplay"></span>
-                <button id="nextDayBtn">Próximo Día →</button>
+    <main>
+        <div class="day-navigation">
+            <button id="prevDayBtn">← Día Anterior</button>
+            <span id="currentDayDisplay"></span>
+            <button id="nextDayBtn">Próximo Día →</button>
+        </div>
+        
+        <div id="turnosContainer">
             </div>
-            
-            <section class="turnos-dia" id="turnos-lunes">
-                <h2>Lunes <span class="fecha-dia"></span></h2>
-                <div class="turnos-grid"></div>
-            </section>
-        
-            <section class="turnos-dia" id="turnos-martes">
-                <h2>Martes <span class="fecha-dia"></span></h2>
-                <div class="turnos-grid"></div>
-            </section>
-        
-            <section class="turnos-dia" id="turnos-miercoles">
-                <h2>Miércoles <span class="fecha-dia"></span></h2>
-                <div class="turnos-grid"></div>
-            </section>
-        
-            <section class="turnos-dia" id="turnos-jueves">
-                <h2>Jueves <span class="fecha-dia"></span></h2>
-                <div class="turnos-grid"></div>
-            </section>
-        
-            <section class="turnos-dia" id="turnos-viernes">
-                <h2>Viernes <span class="fecha-dia"></span></h2>
-                <div class="turnos-grid"></div>
-            </section>
-        
-            <section class="turnos-dia" id="turnos-sabado">
-                <h2>Sábado <span class="fecha-dia"></span></h2>
-                <div class="turnos-grid"></div>
-            </section>
-        
-            <section class="turnos-dia" id="turnos-domingo">
-                <h2>Domingo <span class="fecha-dia"></span></h2>
-                <div class="turnos-grid"></div>
-            </section>
-        </main>
+    </main>
 
     <footer>
         <p>&copy; 2025 Babson Padel. Todos los derechos reservados.</p>
@@ -66,28 +34,33 @@
     <script type="module">
         // Tu objeto firebaseConfig que copiaste de la consola de Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyAOfMJN3GXxXfAzqycARBSV2G2FTkp7TA8",
-            authDomain: "babson-padel.firebaseapp.com",
-            projectId: "babson-padel",
-            storageBucket: "babson-padel.firebasestorage.app",
-            messagingSenderId: "26362855377",
-            appId: "1:26362855377:web:97ca4d59e5afb92cca6af0"
+            apiKey: "AIzaSyAOfMJN3GXxXfAzqycARBSV2G2FTkp7TA8", // Tus credenciales
+            authDomain: "babson-padel.firebaseapp.com", // Tus credenciales
+            projectId: "babson-padel", // Tus credenciales
+            storageBucket: "babson-padel.firebasestorage.app", // Tus credenciales
+            messagingSenderId: "26362855377", // Tus credenciales
+            appId: "1:26362855377:web:97ca4d59e5afb92cca6af0" // Tus credenciales
         };
-      
+        
         // Importar e inicializar Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"; // Lo usaremos para admin.html
-      
+        // *** IMPORTANTE: Aquí se importan todas las funciones de Firestore que usaremos ***
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // *** IMPORTANTE: Aquí se importan todas las funciones de Auth que usaremos ***
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"; 
+        
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app); // Exportamos la instancia de Firestore
-        const auth = getAuth(app); // Exportamos la instancia de Auth
-      
-        // Hacemos 'db' y 'auth' accesibles globalmente (o pasarlos a script.js)
-        // Por simplicidad, los haremos globales por ahora.
+        const db = getFirestore(app); // Instancia de Firestore
+        const auth = getAuth(app); // Instancia de Auth
+        
+        // Hacemos las instancias y funciones clave accesibles globalmente a través de 'window'
         window.db = db;
         window.auth = auth;
-      </script>
+        // *** Hacemos las funciones de Firestore globales ***
+        window.firebaseFirestore = { collection, query, where, getDocs, doc, updateDoc };
+        // *** Hacemos las funciones de Auth globales (para admin-script.js) ***
+        window.firebaseAuth = { signInWithEmailAndPassword, signOut, onAuthStateChanged };
+    </script>
     <script src="script.js"></script>
 </body>
 </html>

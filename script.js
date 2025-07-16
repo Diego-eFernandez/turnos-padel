@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const diasNombres = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
     const mesesNombres = [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mato', 'Junio', // Cuidado, Mato debería ser Mayo
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', // Cuidado, Mato debería ser Mayo
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
 
