@@ -187,25 +187,30 @@ function initializePageLogic() {
 
     async function addInitialTurnosToFirestore() {
         try {
-            // Verifica que 'db' esté definido antes de usarlo.
             if (!db) {
                 console.error("ERROR: 'db' no está disponible en addInitialTurnosToFirestore.");
-                return; // Salir de la función si 'db' no está listo.
+                return;
             }
+            console.log("--- Iniciando addInitialTurnosToFirestore ---");
 
             const turnosRef = collection(db, "turnos");
             const q = query(turnosRef, where("dia", "==", "lunes"));
             const querySnapshot = await getDocs(q);
 
+            console.log(`Verificando si existen turnos para "lunes". querySnapshot.empty: ${querySnapshot.empty}`);
+            console.log(`Número de documentos encontrados para "lunes": ${querySnapshot.size}`);
+
             if (!querySnapshot.empty) {
-                console.log("Ya existen turnos en Firestore. No es necesario subir los datos iniciales.");
+                console.warn("Ya existen turnos en Firestore (se encontró al menos un 'lunes'). No se subirán los datos iniciales para evitar duplicados.");
+                alert("Ya existen turnos en Firestore. Si necesitas resubir, ELIMINA TODOS los documentos de la colección 'turnos' en la Consola de Firebase y recarga la página.");
                 return;
             }
 
-            console.log("No se encontraron turnos. Iniciando la subida de datos iniciales a Firestore...");
+            console.log("No se encontraron turnos para 'lunes'. Iniciando la subida de datos iniciales a Firestore...");
+            console.log("Contenido de turnosData antes de la subida:", turnosData); // Añadido para verificar el objeto
 
             const turnosData = {
-                // ... (tu objeto turnosData completo) ...
+                // ... (tu objeto turnosData completo, asegúrate que esté aquí y sea correcto) ...
                 "lunes": [
                     { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
                     { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
@@ -259,6 +264,7 @@ function initializePageLogic() {
 
             for (const dia in turnosData) {
                 if (turnosData.hasOwnProperty(dia)) {
+                    console.log(`Procesando día: ${dia}`); // Nuevo log
                     for (const turno of turnosData[dia]) {
                         await addDoc(collection(db, "turnos"), {
                             dia: dia,
@@ -270,7 +276,7 @@ function initializePageLogic() {
                     }
                 }
             }
-            console.log("¡Todos los turnos iniciales han sido añadidos a Firestore!");
+            console.log("--- ¡Todos los turnos iniciales han sido añadidos a Firestore! ---");
             alert("¡Los turnos iniciales han sido subidos a Firestore! Ahora, por favor, ve a la Consola de Firebase para verificar. Luego, DEBES QUITAR este código de script.js.");
 
         } catch (e) {
@@ -278,4 +284,4 @@ function initializePageLogic() {
             alert("Hubo un error al subir los turnos iniciales. Revisa la consola para más detalles.");
         }
     }
-} // Fin de initializePageLogic
+}
