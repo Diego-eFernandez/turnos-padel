@@ -1,38 +1,52 @@
+// script.js
+
+// Importa las funciones necesarias directamente al principio del módulo
+import { getFirestore, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// El evento DOMContentLoaded asegura que el HTML esté completamente cargado
 document.addEventListener('DOMContentLoaded', () => {
-    const whatsappNumero = "5492346525248"; // Tu número de WhatsApp con código de país sin el +
+    const whatsappNumero = "5492346525248"; 
 
-    // Variables globales (¡importante que estén fuera de la función cargarYMostrarTurnosDelDia para que mantengan su estado!)
-    let currentDisplayDate = new Date(); // Variable para la fecha del día que se está mostrando
-    let turnosSemanaData = {}; // Variable para almacenar los datos de los turnos cargados de Firestore para el día actual
+    // Obtener la instancia de Firestore usando la app global (window.firebaseApp)
+    // Asegúrate de que window.firebaseApp esté disponible.
+    // getFirestore necesita la instancia de la aplicación de Firebase
+    const db = getFirestore(window.firebaseApp); 
 
-    // Referencias a los botones de navegación y al display del día
+    // Verificación de depuración - Asegura que db no sea undefined
+    if (!db) {
+        console.error("ERROR: Firestore (db) no está inicializado. Asegúrate de que index.html inicialice Firebase correctamente y exponga window.firebaseApp.");
+        alert("Hubo un problema al cargar la base de datos. Por favor, intentá de nuevo más tarde.");
+        return; // Detener la ejecución si db no está disponible
+    }
+    console.log("Firestore (db) está inicializado y disponible.");
+
+    // Variables globales
+    let currentDisplayDate = new Date();
+    let turnosSemanaData = {}; 
+
+    // Referencias a elementos del DOM
     const prevDayBtn = document.getElementById('prevDayBtn');
     const nextDayBtn = document.getElementById('nextDayBtn');
     const currentDayDisplaySpan = document.getElementById('currentDayDisplay');
-    const turnosContainer = document.getElementById('turnosContainer'); // Asegúrate de que este ID exista en tu HTML
-
+    const turnosContainer = document.getElementById('turnosContainer'); 
 
     const diasNombres = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
     const mesesNombres = [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', // Cuidado, Mato debería ser Mayo
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
 
     // Función para obtener la información de un día específico
     function getDiaInfo(date) {
-        // Normaliza el nombre del día para que coincida con lo que guardarás en Firestore ('lunes', 'martes', etc.)
         const nombreDia = diasNombres[date.getDay()];
-        // Formato para mostrar: "Martes 9 de Julio de 2025"
         const fechaFormateada = `${nombreDia.charAt(0).toUpperCase() + nombreDia.slice(1)} ${date.getDate()} de ${mesesNombres[date.getMonth()]} de ${date.getFullYear()}`;
-        
-        // Formato YYYY-MM-DD para el mensaje de WhatsApp, si fuera necesario más preciso
         const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Meses son 0-11
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const day = date.getDate().toString().padStart(2, '0');
         const fechaIso = `${year}-${month}-${day}`;
 
         return {
-            nombre: nombreDia, // Ej: 'lunes', 'martes' (para buscar en Firestore)
+            nombre: nombreDia,
             display: fechaFormateada,
             fullDate: fechaIso
         };
@@ -67,34 +81,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función principal para cargar y mostrar los turnos del día actual
     async function cargarYMostrarTurnosDelDia() {
-        // Accede a la instancia global de Firestore y sus funciones
-        const db = window.db; 
-        const { collection, query, where, getDocs } = window.firebaseFirestore;
-
-        if (!db || !query || !where || !getDocs) {
-            console.error("Firebase Firestore no está completamente inicializado o las funciones no están disponibles.");
-            alert("Hubo un error al conectar con la base de datos. Por favor, intentá de nuevo más tarde.");
-            return;
-        }
-
         try {
-            const turnosRef = collection(db, "turnos"); // Correcto: usa la función 'collection'
-            const diaActualInfo = getDiaInfo(currentDisplayDate); // Obtiene el nombre del día actual (ej. "lunes")
+            // Usamos la función 'collection' que importamos directamente
+            const turnosRef = collection(db, "turnos"); 
+            const diaActualInfo = getDiaInfo(currentDisplayDate);
 
             // Consulta a Firestore: filtra por el día actual
             const q = query(turnosRef, where("dia", "==", diaActualInfo.nombre));
 
-            const snapshot = await getDocs(q); // Ejecuta la consulta filtrada
+            const snapshot = await getDocs(q); 
             
             const loadedTurnos = [];
             snapshot.forEach(doc => {
-                loadedTurnos.push(doc.data()); // Agrega cada turno al array
+                loadedTurnos.push(doc.data()); 
             });
 
-            // Almacena los turnos cargados para el día actual
             turnosSemanaData.turnos = loadedTurnos;
 
-            // Ordenar los turnos por hora
             turnosSemanaData.turnos.sort((a, b) => {
                 const timeA = new Date(`2000/01/01 ${a.hora}`);
                 const timeB = new Date(`2000/01/01 ${b.hora}`);
@@ -102,22 +105,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // --- Lógica de ACTUALIZACIÓN DE LA INTERFAZ ---
-
-            // Actualiza el texto del día en la navegación
             currentDayDisplaySpan.textContent = diaActualInfo.display;
-
-            // Limpia el contenedor de turnos y recrea la estructura para el día
             turnosContainer.innerHTML = ''; 
             const diaSection = document.createElement('section');
-            diaSection.classList.add('turnos-dia', 'active'); // Añadimos 'active' para que se muestre
-            // ID de la sección basada en el día, si es que lo usas en el CSS para algo específico
+            diaSection.classList.add('turnos-dia', 'active'); 
             diaSection.id = `turnos-${diaActualInfo.nombre}`; 
             diaSection.innerHTML = `<h2>${diaActualInfo.display}</h2><div class="turnos-grid"></div>`;
             turnosContainer.appendChild(diaSection);
             
             const turnosGrid = diaSection.querySelector('.turnos-grid');
 
-            // Mostrar los turnos cargados para el día
             if (turnosSemanaData.turnos && turnosSemanaData.turnos.length > 0) {
                 turnosSemanaData.turnos.forEach(turno => {
                     const turnoElement = crearTurnoHTML(turno, diaActualInfo);
@@ -130,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Error al cargar turnos de Firestore:", error);
             alert("Hubo un error al cargar los turnos. Por favor, intentá de nuevo más tarde.");
-            // Si hay un error, limpiar la vista de turnos
             turnosContainer.innerHTML = '<p>Error al cargar los turnos. Por favor, intentá de nuevo.</p>';
         }
     }
@@ -138,16 +134,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Event Listeners para los botones de navegación de días ---
     prevDayBtn.addEventListener('click', () => {
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Establecer a inicio del día para comparación
+        today.setHours(0, 0, 0, 0); 
         
         const newDate = new Date(currentDisplayDate);
         newDate.setDate(newDate.getDate() - 1);
-        newDate.setHours(0, 0, 0, 0); // Establecer a inicio del día para comparación
+        newDate.setHours(0, 0, 0, 0); 
         
-        // Solo permitir ir al día anterior si no es antes de hoy
         if (newDate.getTime() >= today.getTime()) {
             currentDisplayDate.setDate(currentDisplayDate.getDate() - 1);
-            cargarYMostrarTurnosDelDia(); // Recarga los turnos para el nuevo día
+            cargarYMostrarTurnosDelDia(); 
         } else {
             alert('No puedes ver turnos de días pasados.');
         }
@@ -155,17 +150,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     nextDayBtn.addEventListener('click', () => {
         const limitDate = new Date();
-        limitDate.setDate(limitDate.getDate() + 6); // Hoy + 6 días = 7 días en total
-        limitDate.setHours(0, 0, 0, 0); // Establecer a inicio del día para comparación
+        limitDate.setDate(limitDate.getDate() + 6);
+        limitDate.setHours(0, 0, 0, 0); 
         
         const newDate = new Date(currentDisplayDate);
         newDate.setDate(newDate.getDate() + 1);
-        newDate.setHours(0, 0, 0, 0); // Establecer a inicio del día para comparación
+        newDate.setHours(0, 0, 0, 0); 
         
-        // Solo permitir ir al día siguiente si no excede el límite de 7 días
         if (newDate.getTime() <= limitDate.getTime()) {
             currentDisplayDate.setDate(currentDisplayDate.getDate() + 1);
-            cargarYMostrarTurnosDelDia(); // Recarga los turnos para el nuevo día
+            cargarYMostrarTurnosDelDia(); 
         } else {
             alert('Solo puedes ver los turnos para los próximos 7 días.');
         }
@@ -173,119 +167,103 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cargar los turnos del día inicial al cargar la página
     cargarYMostrarTurnosDelDia();
-   // ... (resto de tu script.js hasta el final del DOMContentLoaded) ...
+    
+    // --- CÓDIGO TEMPORAL PARA SUBIR TURNOS A FIRESTORE ---
+    // ¡SOLO SI NECESITÁS SUBIRLOS! QUITALO DESPUÉS DE LA PRIMERA SUBIDA.
+    // Asegúrate de que `addDoc` esté importado arriba en script.js
+    async function addInitialTurnosToFirestore() {
+        try {
+            // Ya tenemos 'db' disponible y 'collection', 'query', 'where', 'getDocs', 'addDoc' importados.
+            const turnosRef = collection(db, "turnos");
+            const q = query(turnosRef, where("dia", "==", "lunes"));
+            const querySnapshot = await getDocs(q);
 
-// --- INICIO CÓDIGO TEMPORAL PARA SUBIR TURNOS A FIRESTORE ---
-// ESTE CÓDIGO SE DEBE QUITAR UNA VEZ QUE LOS TURNOS ESTÉN EN FIRESTORE
+            if (!querySnapshot.empty) {
+                console.log("Ya existen turnos en Firestore. No es necesario subir los datos iniciales.");
+                return;
+            }
 
-async function addInitialTurnosToFirestore() {
-    try {
-        // Accede a la instancia global de Firestore
-        const db = window.db; 
+            console.log("No se encontraron turnos. Iniciando la subida de datos iniciales a Firestore...");
 
-        // Desestructura las funciones necesarias de Firebase Firestore
-        // Asegúrate de que estas funciones existan antes de usarlas
-        const { collection, query, where, getDocs, addDoc } = window.firebaseFirestore || {}; 
-        // Agregamos `|| {}` para evitar un error si window.firebaseFirestore es undefined,
-        // aunque tu index.html debería garantizar que no lo sea.
+            const turnosData = {
+                // ... (tu objeto turnosData completo) ...
+                "lunes": [
+                    { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
+                    { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
+                    { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
+                    { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
+                    { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
+                ],
+                "martes": [
+                    { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
+                    { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
+                    { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
+                    { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
+                    { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
+                ],
+                "miercoles": [
+                    { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
+                    { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
+                    { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
+                    { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
+                    { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
+                ],
+                "jueves": [
+                    { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
+                    { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
+                    { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
+                    { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
+                    { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
+                ],
+                "viernes": [
+                    { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
+                    { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
+                    { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
+                    { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
+                    { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
+                ],
+                "sabado": [
+                    { "hora": "08:00", "precio": 2000, "disponible": true }, { "hora": "09:00", "precio": 2000, "disponible": true }, { "hora": "10:00", "precio": 2000, "disponible": true },
+                    { "hora": "11:00", "precio": 2000, "disponible": true }, { "hora": "12:00", "precio": 2000, "disponible": true }, { "hora": "13:00", "precio": 2000, "disponible": true },
+                    { "hora": "14:00", "precio": 2000, "disponible": true }, { "hora": "15:00", "precio": 2000, "disponible": true }, { "hora": "16:00", "precio": 2000, "disponible": true },
+                    { "hora": "17:00", "precio": 2000, "disponible": true }, { "hora": "18:00", "precio": 2500, "disponible": true }, { "hora": "19:00", "precio": 2500, "disponible": true },
+                    { "hora": "20:00", "precio": 2500, "disponible": true }, { "hora": "21:00", "precio": 2500, "disponible": true }, { "hora": "22:00", "precio": 2500, "disponible": true }
+                ],
+                "domingo": [
+                    { "hora": "08:00", "precio": 2000, "disponible": true }, { "hora": "09:00", "precio": 2000, "disponible": true }, { "hora": "10:00", "precio": 2000, "disponible": true },
+                    { "hora": "11:00", "precio": 2000, "disponible": true }, { "hora": "12:00", "precio": 2000, "disponible": true }, { "hora": "13:00", "precio": 2000, "disponible": true },
+                    { "hora": "14:00", "precio": 2000, "disponible": true }, { "hora": "15:00", "precio": 2000, "disponible": true }, { "hora": "16:00", "precio": 2000, "disponible": true },
+                    { "hora": "17:00", "precio": 2000, "disponible": true }, { "hora": "18:00", "precio": 2500, "disponible": true }, { "hora": "19:00", "precio": 2500, "disponible": true },
+                    { "hora": "20:00", "precio": 2500, "disponible": true }, { "hora": "21:00", "precio": 2500, "disponible": true }, { "hora": "22:00", "precio": 2500, "disponible": true }
+                ]
+            };
 
-        if (!db || !collection || !query || !where || !getDocs || !addDoc) {
-            console.error("Firebase Firestore no está completamente inicializado o faltan funciones (collection, addDoc, etc.).");
-            alert("Error: No se pudo conectar a la base de datos de Firebase. Por favor, intentá de nuevo más tarde.");
-            return;
-        }
-
-        // Comprobamos si ya existen turnos para el lunes
-        const turnosRef = collection(db, "turnos");
-        const q = query(turnosRef, where("dia", "==", "lunes"));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-            console.log("Ya existen turnos en Firestore. No es necesario subir los datos iniciales.");
-            return; 
-        }
-
-        console.log("No se encontraron turnos. Iniciando la subida de datos iniciales a Firestore...");
-
-        const turnosData = {
-            "lunes": [
-                { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
-                { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
-                { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
-                { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
-                { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
-            ],
-            "martes": [
-                { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
-                { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
-                { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
-                { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
-                { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
-            ],
-            "miercoles": [
-                { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
-                { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
-                { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
-                { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
-                { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
-            ],
-            "jueves": [
-                { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
-                { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
-                { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
-                { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
-                { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
-            ],
-            "viernes": [
-                { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
-                { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
-                { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
-                { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
-                { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
-            ],
-            "sabado": [
-                { "hora": "08:00", "precio": 2000, "disponible": true }, { "hora": "09:00", "precio": 2000, "disponible": true }, { "hora": "10:00", "precio": 2000, "disponible": true },
-                { "hora": "11:00", "precio": 2000, "disponible": true }, { "hora": "12:00", "precio": 2000, "disponible": true }, { "hora": "13:00", "precio": 2000, "disponible": true },
-                { "hora": "14:00", "precio": 2000, "disponible": true }, { "hora": "15:00", "precio": 2000, "disponible": true }, { "hora": "16:00", "precio": 2000, "disponible": true },
-                { "hora": "17:00", "precio": 2000, "disponible": true }, { "hora": "18:00", "precio": 2500, "disponible": true }, { "hora": "19:00", "precio": 2500, "disponible": true },
-                { "hora": "20:00", "precio": 2500, "disponible": true }, { "hora": "21:00", "precio": 2500, "disponible": true }, { "hora": "22:00", "precio": 2500, "disponible": true }
-            ],
-            "domingo": [
-                { "hora": "08:00", "precio": 2000, "disponible": true }, { "hora": "09:00", "precio": 2000, "disponible": true }, { "hora": "10:00", "precio": 2000, "disponible": true },
-                { "hora": "11:00", "precio": 2000, "disponible": true }, { "hora": "12:00", "precio": 2000, "disponible": true }, { "hora": "13:00", "precio": 2000, "disponible": true },
-                { "hora": "14:00", "precio": 2000, "disponible": true }, { "hora": "15:00", "precio": 2000, "disponible": true }, { "hora": "16:00", "precio": 2000, "disponible": true },
-                { "hora": "17:00", "precio": 2000, "disponible": true }, { "hora": "18:00", "precio": 2500, "disponible": true }, { "hora": "19:00", "precio": 2500, "disponible": true },
-                { "hora": "20:00", "precio": 2500, "disponible": true }, { "hora": "21:00", "precio": 2500, "disponible": true }, { "hora": "22:00", "precio": 2500, "disponible": true }
-            ]
-        };
-
-        for (const dia in turnosData) {
-            if (turnosData.hasOwnProperty(dia)) {
-                for (const turno of turnosData[dia]) {
-                    await addDoc(collection(db, "turnos"), { // Usa addDoc con collection(db, ...)
-                        dia: dia,
-                        hora: turno.hora,
-                        precio: turno.precio,
-                        disponible: turno.disponible
-                    });
-                    console.log(`Turno ${dia} ${turno.hora} añadido.`);
+            for (const dia in turnosData) {
+                if (turnosData.hasOwnProperty(dia)) {
+                    for (const turno of turnosData[dia]) {
+                        await addDoc(collection(db, "turnos"), {
+                            dia: dia,
+                            hora: turno.hora,
+                            precio: turno.precio,
+                            disponible: turno.disponible
+                        });
+                        console.log(`Turno ${dia} ${turno.hora} añadido.`);
+                    }
                 }
             }
+            console.log("¡Todos los turnos iniciales han sido añadidos a Firestore!");
+            alert("¡Los turnos iniciales han sido subidos a Firestore! Ahora, por favor, ve a la Consola de Firebase para verificar. Luego, DEBES QUITAR este código de script.js.");
+
+        } catch (e) {
+            console.error("Error al subir los turnos iniciales:", e);
+            alert("Hubo un error al subir los turnos iniciales. Revisa la consola para más detalles.");
         }
-        console.log("¡Todos los turnos iniciales han sido añadidos a Firestore!");
-        alert("¡Los turnos iniciales han sido subidos a Firestore! Ahora, por favor, ve a la Consola de Firebase para verificar. Luego, DEBES QUITAR este código de script.js.");
-
-    } catch (e) {
-        console.error("Error al subir los turnos iniciales:", e);
-        alert("Hubo un error al subir los turnos iniciales. Revisa la consola para más detalles.");
     }
-}
 
-// Llama a la función para subir los datos con un pequeño retraso
-// ESTE setTimeout ES CRÍTICO
-setTimeout(() => {
-    addInitialTurnosToFirestore();
-}, 1500); // Aumentamos el retraso a 1.5 segundos por si acaso
+    // Llama a la función para subir los datos con un pequeño retraso
+    setTimeout(() => {
+        addInitialTurnosToFirestore();
+    }, 1500); 
 
-// --- FIN CÓDIGO TEMPORAL ---
-}); // Cierre del DOMContentLoaded
+    // --- FIN CÓDIGO TEMPORAL ---
+});

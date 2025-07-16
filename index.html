@@ -32,35 +32,26 @@
     </footer>
     
     <script type="module">
-        // Tu objeto firebaseConfig que copiaste de la consola de Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        
         const firebaseConfig = {
-            apiKey: "AIzaSyAOfMJN3GXxXfAzqycARBSV2G2FTkp7TA8", // Tus credenciales
-            authDomain: "babson-padel.firebaseapp.com", // Tus credenciales
-            projectId: "babson-padel", // Tus credenciales
-            storageBucket: "babson-padel.firebasestorage.app", // Tus credenciales
-            messagingSenderId: "26362855377", // Tus credenciales
-            appId: "1:26362855377:web:97ca4d59e5afb92cca6af0" // Tus credenciales
+            apiKey: "AIzaSyAOfMJN3GXxXfAzqycARBSV2G2FTkp7TA8",
+            authDomain: "babson-padel.firebaseapp.com",
+            projectId: "babson-padel",
+            storageBucket: "babson-padel.firebasestorage.app",
+            messagingSenderId: "26362855377",
+            appId: "1:26362855377:web:97ca4d59e5afb92cca6af0"
         };
         
-        // Importar e inicializar Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        // *** IMPORTANTE: Aquí se importan todas las funciones de Firestore que usaremos ***
-        import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        // *** IMPORTANTE: Aquí se importan todas las funciones de Auth que usaremos ***
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"; 
-        
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app); // Instancia de Firestore
-        const auth = getAuth(app); // Instancia de Auth
         
-        // Hacemos las instancias y funciones clave accesibles globalmente a través de 'window'
-        window.db = db;
-        window.auth = auth;
-        // *** Hacemos las funciones de Firestore globales ***
-        window.firebaseFirestore = { collection, query, where, getDocs, doc, updateDoc };
-        // *** Hacemos las funciones de Auth globales (para admin-script.js) ***
-        window.firebaseAuth = { signInWithEmailAndPassword, signOut, onAuthStateChanged };
+        // Hacemos la instancia 'app' global. Esto es útil si otros scripts
+        // necesitan acceder a 'app' para obtener servicios como Firestore o Auth.
+        // Pero las funciones de los servicios (collection, getFirestore, etc.)
+        // las importará cada script individualmente.
+        window.firebaseApp = app; 
     </script>
-    <script src="script.js"></script>
+    
+    <script src="script.js" type="module"></script>
 </body>
 </html>
