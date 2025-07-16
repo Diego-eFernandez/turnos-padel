@@ -64,18 +64,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función principal para cargar y mostrar los turnos del día actual
     async function cargarYMostrarTurnosDelDia() {
-        // Si los datos del JSON no se han cargado, los cargamos una sola vez
-        if (Object.keys(turnosSemanaData).length === 0) {
-            try {
-                const timestamp = new Date().getTime(); // Genera un número único basado en la hora actual
-                const response = await fetch(`turnos.json?v=${timestamp}`); // Añade el timestamp como parámetro
-                turnosSemanaData = await response.json();
-            } catch (error) {
-                console.error('Error al cargar los turnos desde turnos.json:', error);
-                alert('Hubo un error al cargar los turnos. Por favor, intentá de nuevo más tarde.');
-                return;
-            }
-        }
+        // Si los datos no se han cargado de Firestore, los cargamos una sola vez
+if (Object.keys(turnosSemanaData).length === 0) {
+    const db = window.db; // Accede a la instancia global de Firestore
+
+    if (!db) {
+        console.error("Firestore no está inicializado.");
+        alert("Hubo un error al conectar con la base de datos. Por favor, intentá de nuevo más tarde.");
+        return;
+    }
+
+    try {
+        const turnosRef = db.collection("turnos"); // Referencia a tu colección 'turnos' en Firestore
+        const snapshot = await turnosRef.get(); // Obtiene todos los documentos de esa colección
+
+        const loadedTurnos = [];
+        snapshot.forEach(doc => {
+            loadedTurnos.push(doc.data()); // Agrega cada turno al array
+        });
+
+        // Asigna los turnos cargados a turnosSemanaData en el formato esperado
+        // Asumo que turnosSemanaData.turnos es un array de turnos
+        turnosSemanaData = { turnos: loadedTurnos };
+
+        // Opcional: Ordenar los turnos por hora si no están garantizados ordenados en Firestore
+        // Esto es importante para que se muestren en el orden correcto
+        turnosSemanaData.turnos.sort((a, b) => {
+            const timeA = new Date(`2000/01/01 ${a.hora}`);
+            const timeB = new Date(`2000/01/01 ${b.hora}`);
+            return timeA - timeB;
+        });
+
+    } catch (error) {
+        console.error("Error al cargar turnos de Firestore:", error);
+        alert("Hubo un error al cargar los turnos. Por favor, intentá de nuevo más tarde.");
+        return; // Detiene la ejecución si hay error al cargar
+    }
+}
+// El resto de tu función cargarYMostrarTurnosDelDia() sigue igual aquí abajo
+// Por ejemplo, la línea: const turnos = turnosSemanaData.turnos;
+// Y toda la lógica de filtrado y display de turnos.
 
         // Obtener la información del día que vamos a mostrar
         const diaActualInfo = getDiaInfo(currentDisplayDate);

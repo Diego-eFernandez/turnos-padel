@@ -62,7 +62,32 @@
         <p>&copy; 2025 Babson Padel. Todos los derechos reservados.</p>
         <p>Contacto WhatsApp: +54 9 2346 123456</p>
     </footer>
-
+    
+    <script type="module">
+        // Tu objeto firebaseConfig que copiaste de la consola de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOfMJN3GXxXfAzqycARBSV2G2FTkp7TA8",
+            authDomain: "babson-padel.firebaseapp.com",
+            projectId: "babson-padel",
+            storageBucket: "babson-padel.firebasestorage.app",
+            messagingSenderId: "26362855377",
+            appId: "1:26362855377:web:97ca4d59e5afb92cca6af0"
+        };
+      
+        // Importar e inicializar Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"; // Lo usaremos para admin.html
+      
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app); // Exportamos la instancia de Firestore
+        const auth = getAuth(app); // Exportamos la instancia de Auth
+      
+        // Hacemos 'db' y 'auth' accesibles globalmente (o pasarlos a script.js)
+        // Por simplicidad, los haremos globales por ahora.
+        window.db = db;
+        window.auth = auth;
+      </script>
     <script src="script.js"></script>
 </body>
 </html>
