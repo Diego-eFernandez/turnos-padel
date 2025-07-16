@@ -23,7 +23,7 @@
         </div>
         
         <div id="turnosContainer">
-            </div>
+        </div>
     </main>
 
     <footer>
@@ -31,11 +31,15 @@
         <p>Contacto WhatsApp: +54 9 2346 123456</p>
     </footer>
     
+    <script src="script.js" type="module" defer></script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        // *** NUEVO: Importa getFirestore aquí ***
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         
         const firebaseConfig = {
-            apiKey: "AIzaSyAOfMJN3GXxXfAzqycARBSV2G2FTkp7TA8",
+            apiKey: "AIzaSyAOfMJN3GXxXfAzqycARBSV2G2FTkp7TA8", 
             authDomain: "babson-padel.firebaseapp.com",
             projectId: "babson-padel",
             storageBucket: "babson-padel.firebasestorage.app",
@@ -43,15 +47,21 @@
             appId: "1:26362855377:web:97ca4d59e5afb92cca6af0"
         };
         
+        // Inicializa Firebase App
         const app = initializeApp(firebaseConfig);
         
-        // Hacemos la instancia 'app' global. Esto es útil si otros scripts
-        // necesitan acceder a 'app' para obtener servicios como Firestore o Auth.
-        // Pero las funciones de los servicios (collection, getFirestore, etc.)
-        // las importará cada script individualmente.
-        window.firebaseApp = app; 
+        // *** NUEVO: Obtén la instancia de Firestore aquí mismo ***
+        const db = getFirestore(app);
+
+        // *** Novedad importante para la sincronización ***
+        // Llama a una función global en script.js, pasándole las instancias de Firebase
+        // Esto solo se ejecutará si window.initBabsonPadelApp está definido (es decir, script.js ya cargó gracias a 'defer')
+        if (window.initBabsonPadelApp) {
+            window.initBabsonPadelApp(app, db); // Pasa la app y la instancia de db a script.js
+        } else {
+            // Este error solo debería aparecer si hay un problema con la carga de script.js
+            console.error("Error: window.initBabsonPadelApp no está definido. Asegúrate que script.js cargue con 'defer'.");
+        }
     </script>
-    
-    <script src="script.js" type="module"></script>
 </body>
 </html>

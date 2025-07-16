@@ -1,24 +1,37 @@
 // script.js
 
 // Importa las funciones necesarias directamente al principio del módulo
-import { getFirestore, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// No necesitamos importar getFirestore aquí si lo recibimos por parámetro en initBabsonPadelApp
+import { collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// El evento DOMContentLoaded asegura que el HTML esté completamente cargado
-document.addEventListener('DOMContentLoaded', () => {
-    const whatsappNumero = "5492346525248"; 
+// Variable para almacenar la instancia de la base de datos una vez que se inicialice
+let db; 
+let firebaseAppInstance; // Opcional, si necesitas la instancia de la app
 
-    // Obtener la instancia de Firestore usando la app global (window.firebaseApp)
-    // Asegúrate de que window.firebaseApp esté disponible.
-    // getFirestore necesita la instancia de la aplicación de Firebase
-    const db = getFirestore(window.firebaseApp); 
+// *** FUNCIÓN DE INICIALIZACIÓN GLOBAL ***
+// El script de index.html la llamará cuando Firebase esté listo.
+window.initBabsonPadelApp = (appInstance, firestoreDbInstance) => {
+    firebaseAppInstance = appInstance; // Guarda la instancia de la app si la necesitas
+    db = firestoreDbInstance;          // Asigna la instancia de db
 
     // Verificación de depuración - Asegura que db no sea undefined
     if (!db) {
-        console.error("ERROR: Firestore (db) no está inicializado. Asegúrate de que index.html inicialice Firebase correctamente y exponga window.firebaseApp.");
+        console.error("ERROR: Firestore (db) no fue pasado correctamente a initBabsonPadelApp.");
         alert("Hubo un problema al cargar la base de datos. Por favor, intentá de nuevo más tarde.");
-        return; // Detener la ejecución si db no está disponible
+        return;
     }
-    console.log("Firestore (db) está inicializado y disponible.");
+    console.log("Firestore (db) está inicializado y disponible en script.js.");
+
+    // Ahora que 'db' está garantizado, podemos ejecutar el resto del código
+    // que depende de Firebase.
+    initializePageLogic();
+};
+
+
+// Mueve todo el código de DOMContentLoaded a una nueva función
+// que se llamará una vez que Firebase esté listo.
+function initializePageLogic() {
+    const whatsappNumero = "5492346525248";
 
     // Variables globales
     let currentDisplayDate = new Date();
@@ -82,11 +95,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Función principal para cargar y mostrar los turnos del día actual
     async function cargarYMostrarTurnosDelDia() {
         try {
-            // Usamos la función 'collection' que importamos directamente
             const turnosRef = collection(db, "turnos"); 
             const diaActualInfo = getDiaInfo(currentDisplayDate);
 
-            // Consulta a Firestore: filtra por el día actual
             const q = query(turnosRef, where("dia", "==", diaActualInfo.nombre));
 
             const snapshot = await getDocs(q); 
@@ -104,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return timeA - timeB;
             });
 
-            // --- Lógica de ACTUALIZACIÓN DE LA INTERFAZ ---
             currentDayDisplaySpan.textContent = diaActualInfo.display;
             turnosContainer.innerHTML = ''; 
             const diaSection = document.createElement('section');
@@ -169,11 +179,20 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarYMostrarTurnosDelDia();
     
     // --- CÓDIGO TEMPORAL PARA SUBIR TURNOS A FIRESTORE ---
-    // ¡SOLO SI NECESITÁS SUBIRLOS! QUITALO DESPUÉS DE LA PRIMERA SUBIDA.
-    // Asegúrate de que `addDoc` esté importado arriba en script.js
+    // ¡IMPORTANTE: ESTA LLAMADA YA NO USA setTimeout! Se ejecuta directamente.
+    // Solo si necesitas subir los turnos iniciales. QUITALO DESPUÉS DE LA PRIMERA SUBIDA.
+    addInitialTurnosToFirestore(); 
+    // --- FIN CÓDIGO TEMPORAL ---
+
+
     async function addInitialTurnosToFirestore() {
         try {
-            // Ya tenemos 'db' disponible y 'collection', 'query', 'where', 'getDocs', 'addDoc' importados.
+            // Verifica que 'db' esté definido antes de usarlo.
+            if (!db) {
+                console.error("ERROR: 'db' no está disponible en addInitialTurnosToFirestore.");
+                return; // Salir de la función si 'db' no está listo.
+            }
+
             const turnosRef = collection(db, "turnos");
             const q = query(turnosRef, where("dia", "==", "lunes"));
             const querySnapshot = await getDocs(q);
@@ -259,11 +278,4 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Hubo un error al subir los turnos iniciales. Revisa la consola para más detalles.");
         }
     }
-
-    // Llama a la función para subir los datos con un pequeño retraso
-    setTimeout(() => {
-        addInitialTurnosToFirestore();
-    }, 1500); 
-
-    // --- FIN CÓDIGO TEMPORAL ---
-});
+} // Fin de initializePageLogic
