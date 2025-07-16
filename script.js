@@ -178,12 +178,6 @@ function initializePageLogic() {
     // Cargar los turnos del día inicial al cargar la página
     cargarYMostrarTurnosDelDia();
     
-    // --- CÓDIGO TEMPORAL PARA SUBIR TURNOS A FIRESTORE ---
-    // ¡IMPORTANTE: ESTA LLAMADA YA NO USA setTimeout! Se ejecuta directamente.
-    // Solo si necesitas subir los turnos iniciales. QUITALO DESPUÉS DE LA PRIMERA SUBIDA.
-    addInitialTurnosToFirestore(); 
-    // --- FIN CÓDIGO TEMPORAL ---
-
 
     async function addInitialTurnosToFirestore() {
         try {
