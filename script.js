@@ -207,8 +207,8 @@ function initializePageLogic() {
             }
 
             console.log("No se encontraron turnos para 'lunes'. Iniciando la subida de datos iniciales a Firestore...");
-            console.log("Contenido de turnosData antes de la subida:", turnosData); // Añadido para verificar el objeto
-
+            
+            // *** ESTE ES EL CAMBIO: El objeto turnosData se declara aquí ***
             const turnosData = {
                 // ... (tu objeto turnosData completo, asegúrate que esté aquí y sea correcto) ...
                 "lunes": [
@@ -261,10 +261,13 @@ function initializePageLogic() {
                     { "hora": "20:00", "precio": 2500, "disponible": true }, { "hora": "21:00", "precio": 2500, "disponible": true }, { "hora": "22:00", "precio": 2500, "disponible": true }
                 ]
             };
+            // *** Y aquí es donde el console.log debe ir, DESPUÉS de la declaración ***
+            console.log("Contenido de turnosData antes de la subida:", turnosData); 
+
 
             for (const dia in turnosData) {
                 if (turnosData.hasOwnProperty(dia)) {
-                    console.log(`Procesando día: ${dia}`); // Nuevo log
+                    console.log(`Procesando día: ${dia}`); 
                     for (const turno of turnosData[dia]) {
                         await addDoc(collection(db, "turnos"), {
                             dia: dia,
