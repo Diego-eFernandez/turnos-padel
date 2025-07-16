@@ -15,33 +15,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const auth = window.auth;
     const db = window.db;
     const { signInWithEmailAndPassword, signOut, onAuthStateChanged } = window.firebaseAuth;
+    // Asegúrate de que updateDoc y doc estén importados
     const { collection, query, where, getDocs, doc, updateDoc } = window.firebaseFirestore;
 
     let currentAdminTurnos = []; // Almacenará los turnos cargados para la edición
 
-    // --- Funciones de Autenticación ---
+    // --- Funciones de Autenticación (sin cambios) ---
 
-    // Función para manejar el estado de autenticación
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Usuario logueado
-            authSection.style.display = 'none'; // Oculta el formulario de login
-            adminContent.style.display = 'block'; // Muestra el contenido de administración
-            logoutBtn.style.display = 'inline-block'; // Muestra el botón de logout
-            authErrorMessage.textContent = ''; // Limpia mensajes de error
+            authSection.style.display = 'none';
+            adminContent.style.display = 'block';
+            logoutBtn.style.display = 'inline-block';
+            authErrorMessage.textContent = '';
             console.log("Usuario logueado:", user.email);
-            cargarTurnosAdmin(); // Carga los turnos para la edición
+            cargarTurnosAdmin();
         } else {
-            // Usuario no logueado
-            authSection.style.display = 'block'; // Muestra el formulario de login
-            adminContent.style.display = 'none'; // Oculta el contenido de administración
-            logoutBtn.style.display = 'none'; // Oculta el botón de logout
+            authSection.style.display = 'block';
+            adminContent.style.display = 'none';
+            logoutBtn.style.display = 'none';
             console.log("Usuario no logueado.");
-            turnosAdminContainer.innerHTML = ''; // Limpia turnos si el usuario se desloguea
+            turnosAdminContainer.innerHTML = '';
         }
     });
 
-    // Manejar el login
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = emailInput.value;
@@ -49,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            // La función onAuthStateChanged manejará la UI
         } catch (error) {
             console.error("Error al iniciar sesión:", error.code, error.message);
             let errorMessage = "Error al iniciar sesión. Intenta de nuevo.";
@@ -64,11 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Manejar el logout
     logoutBtn.addEventListener('click', async () => {
         try {
             await signOut(auth);
-            // La función onAuthStateChanged manejará la UI
         } catch (error) {
             console.error("Error al cerrar sesión:", error);
             alert("Error al cerrar sesión. Por favor, intenta de nuevo.");
@@ -78,17 +72,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Funciones de Gestión de Turnos (Admin) ---
 
     async function cargarTurnosAdmin() {
-        // Este es un ejemplo para cargar todos los turnos.
-        // Más adelante podemos añadir filtros por día si es necesario.
         try {
+            turnosAdminContainer.innerHTML = '<p>Cargando turnos...</p>'; // Muestra mensaje de carga
             const turnosRef = collection(db, "turnos");
             const snapshot = await getDocs(turnosRef);
-            currentAdminTurnos = []; // Limpiar turnos anteriores
-            turnosAdminContainer.innerHTML = ''; // Limpiar el contenedor HTML
+            currentAdminTurnos = [];
 
             snapshot.forEach(doc => {
                 const turnoData = doc.data();
-                turnoData.id = doc.id; // Guarda el ID del documento para futuras actualizaciones
+                turnoData.id = doc.id;
                 currentAdminTurnos.push(turnoData);
             });
 
@@ -137,29 +129,54 @@ document.addEventListener('DOMContentLoaded', () => {
             turnoDiv.classList.add('admin-turno-item');
             turnoDiv.dataset.id = turno.id; // Guarda el ID del documento en el HTML
 
+            // MODIFICACIÓN CRÍTICA AQUÍ: Añadir inputs para hora y precio
             turnoDiv.innerHTML = `
-                <span>${turno.hora}</span> - $${turno.precio}
-                <label>
-                    <input type="checkbox" ${turno.disponible ? 'checked' : ''} data-id="${turno.id}" data-property="disponible"> Disponible
-                </label>
+                <div class="turno-data-inputs">
+                    <label for="hora-${turno.id}">Hora:</label>
+                    <input type="time" id="hora-${turno.id}" data-id="${turno.id}" data-property="hora" value="${turno.hora}">
+                </div>
+                <div class="turno-data-inputs">
+                    <label for="precio-${turno.id}">Precio:</label>
+                    <input type="number" id="precio-${turno.id}" data-id="${turno.id}" data-property="precio" value="${turno.precio}" min="0">
+                </div>
+                <div class="turno-checkbox">
+                    <label for="disponible-${turno.id}">
+                        <input type="checkbox" id="disponible-${turno.id}" data-id="${turno.id}" data-property="disponible" ${turno.disponible ? 'checked' : ''}> Disponible
+                    </label>
+                </div>
             `;
             currentDayDiv.appendChild(turnoDiv);
         });
 
-        // Añadir event listeners a los checkboxes para actualizar el modelo
-        turnosAdminContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', (e) => {
+        // Añadir event listeners para actualizar el modelo localmente
+        turnosAdminContainer.querySelectorAll('input[type="checkbox"], input[type="time"], input[type="number"]').forEach(input => {
+            input.addEventListener('change', (e) => {
                 const id = e.target.dataset.id;
-                const isAvailable = e.target.checked;
+                const property = e.target.dataset.property;
+                let value;
+
+                // Determinar el valor basado en el tipo de input
+                if (e.target.type === 'checkbox') {
+                    value = e.target.checked;
+                } else if (e.target.type === 'number') {
+                    value = parseInt(e.target.value, 10);
+                } else { // type === 'time'
+                    value = e.target.value;
+                }
+
                 const turnoIndex = currentAdminTurnos.findIndex(t => t.id === id);
                 if (turnoIndex > -1) {
-                    currentAdminTurnos[turnoIndex].disponible = isAvailable;
-                    // Opcional: añadir clase visual instantánea si lo deseas
-                    const turnoDiv = checkbox.closest('.admin-turno-item');
-                    if (isAvailable) {
-                        turnoDiv.classList.remove('ocupado');
-                    } else {
-                        turnoDiv.classList.add('ocupado');
+                    currentAdminTurnos[turnoIndex][property] = value;
+                    console.log(`Turno ${id} en caché actualizado: ${property} -> ${value}`);
+
+                    // Opcional: añadir clase visual instantánea si lo deseas para disponibilidad
+                    if (property === 'disponible') {
+                        const turnoDiv = input.closest('.admin-turno-item');
+                        if (value) {
+                            turnoDiv.classList.remove('ocupado');
+                        } else {
+                            turnoDiv.classList.add('ocupado');
+                        }
                     }
                 }
             });
@@ -182,11 +199,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for (const turno of currentAdminTurnos) {
             try {
-                // Referencia al documento específico en Firestore
                 const turnoDocRef = doc(db, "turnos", turno.id);
-                // Actualiza solo el campo 'disponible'
+                // ACTUALIZACIÓN CRÍTICA AQUÍ: Incluir hora y precio en la actualización
                 await updateDoc(turnoDocRef, {
-                    disponible: turno.disponible
+                    disponible: turno.disponible,
+                    hora: turno.hora, // Añadido
+                    precio: turno.precio // Añadido
                 });
                 updatesCount++;
             } catch (error) {
