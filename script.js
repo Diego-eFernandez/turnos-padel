@@ -173,4 +173,109 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cargar los turnos del día inicial al cargar la página
     cargarYMostrarTurnosDelDia();
+    // --- INICIO CÓDIGO TEMPORAL PARA SUBIR TURNOS A FIRESTORE ---
+// ESTE CÓDIGO SE DEBE QUITAR UNA VEZ QUE LOS TURNOS ESTÉN EN FIRESTORE
+
+async function addInitialTurnosToFirestore() {
+    // Solo ejecutamos esto si NO hay turnos en la base de datos para el día actual (lunes)
+    // Esto previene que se dupliquen si ya se ejecutó antes.
+    try {
+        const { collection, query, where, getDocs, addDoc } = window.firebaseFirestore;
+        const db = window.db;
+
+        if (!db) {
+            console.error("Firestore no está inicializado.");
+            return;
+        }
+
+        // Comprobamos si ya existen turnos para el lunes (o cualquier día que sepas que tiene turnos)
+        const turnosRef = collection(db, "turnos");
+        const q = query(turnosRef, where("dia", "==", "lunes"));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            console.log("Ya existen turnos en Firestore. No es necesario subir los datos iniciales.");
+            return; // Salimos de la función si ya hay turnos
+        }
+
+        console.log("No se encontraron turnos. Iniciando la subida de datos iniciales a Firestore...");
+
+        const turnosData = {
+            "lunes": [
+                { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
+                { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
+                { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
+                { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
+                { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
+            ],
+            "martes": [
+                { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
+                { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
+                { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
+                { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
+                { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
+            ],
+            "miercoles": [
+                { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
+                { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
+                { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
+                { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
+                { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
+            ],
+            "jueves": [
+                { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
+                { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
+                { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
+                { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
+                { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
+            ],
+            "viernes": [
+                { "hora": "08:00", "precio": 1500, "disponible": true }, { "hora": "09:00", "precio": 1500, "disponible": true }, { "hora": "10:00", "precio": 1500, "disponible": true },
+                { "hora": "11:00", "precio": 1500, "disponible": true }, { "hora": "12:00", "precio": 1500, "disponible": true }, { "hora": "13:00", "precio": 1500, "disponible": true },
+                { "hora": "14:00", "precio": 1500, "disponible": true }, { "hora": "15:00", "precio": 1500, "disponible": true }, { "hora": "16:00", "precio": 1500, "disponible": true },
+                { "hora": "17:00", "precio": 1500, "disponible": true }, { "hora": "18:00", "precio": 2000, "disponible": true }, { "hora": "19:00", "precio": 2000, "disponible": true },
+                { "hora": "20:00", "precio": 2000, "disponible": true }, { "hora": "21:00", "precio": 2000, "disponible": true }, { "hora": "22:00", "precio": 2000, "disponible": true }
+            ],
+            "sabado": [
+                { "hora": "08:00", "precio": 2000, "disponible": true }, { "hora": "09:00", "precio": 2000, "disponible": true }, { "hora": "10:00", "precio": 2000, "disponible": true },
+                { "hora": "11:00", "precio": 2000, "disponible": true }, { "hora": "12:00", "precio": 2000, "disponible": true }, { "hora": "13:00", "precio": 2000, "disponible": true },
+                { "hora": "14:00", "precio": 2000, "disponible": true }, { "hora": "15:00", "precio": 2000, "disponible": true }, { "hora": "16:00", "precio": 2000, "disponible": true },
+                { "hora": "17:00", "precio": 2000, "disponible": true }, { "hora": "18:00", "precio": 2500, "disponible": true }, { "hora": "19:00", "precio": 2500, "disponible": true },
+                { "hora": "20:00", "precio": 2500, "disponible": true }, { "hora": "21:00", "precio": 2500, "disponible": true }, { "hora": "22:00", "precio": 2500, "disponible": true }
+            ],
+            "domingo": [
+                { "hora": "08:00", "precio": 2000, "disponible": true }, { "hora": "09:00", "precio": 2000, "disponible": true }, { "hora": "10:00", "precio": 2000, "disponible": true },
+                { "hora": "11:00", "precio": 2000, "disponible": true }, { "hora": "12:00", "precio": 2000, "disponible": true }, { "hora": "13:00", "precio": 2000, "disponible": true },
+                { "hora": "14:00", "precio": 2000, "disponible": true }, { "hora": "15:00", "precio": 2000, "disponible": true }, { "hora": "16:00", "precio": 2000, "disponible": true },
+                { "hora": "17:00", "precio": 2000, "disponible": true }, { "hora": "18:00", "precio": 2500, "disponible": true }, { "hora": "19:00", "precio": 2500, "disponible": true },
+                { "hora": "20:00", "precio": 2500, "disponible": true }, { "hora": "21:00", "precio": 2500, "disponible": true }, { "hora": "22:00", "precio": 2500, "disponible": true }
+            ]
+        };
+
+        for (const dia in turnosData) {
+            if (turnosData.hasOwnProperty(dia)) {
+                for (const turno of turnosData[dia]) {
+                    await addDoc(collection(db, "turnos"), {
+                        dia: dia,
+                        hora: turno.hora,
+                        precio: turno.precio,
+                        disponible: turno.disponible
+                    });
+                    console.log(`Turno ${dia} ${turno.hora} añadido.`);
+                }
+            }
+        }
+        console.log("¡Todos los turnos iniciales han sido añadidos a Firestore!");
+        alert("¡Los turnos iniciales han sido subidos a Firestore! Ahora, por favor, ve a la Consola de Firebase para verificar. Luego, DEBES QUITAR este código de script.js.");
+
+    } catch (e) {
+        console.error("Error al subir los turnos iniciales:", e);
+        alert("Hubo un error al subir los turnos iniciales. Revisa la consola para más detalles.");
+    }
+}
+
+// Llama a la función para subir los datos
+addInitialTurnosToFirestore();
+
+// --- FIN CÓDIGO TEMPORAL ---
 }); // Cierre del DOMContentLoaded
