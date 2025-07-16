@@ -116,12 +116,26 @@
 </head>
 <body>
     <main>
+        <section id="auth-section">
+            <h2>Iniciar Sesión de Administrador</h2>
+            <form id="login-form">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required><br><br>
+                
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" required><br><br>
+                
+                <button type="submit" id="login-btn">Iniciar Sesión</button>
+                <button type="button" id="logout-btn" style="display: none;">Cerrar Sesión</button>
+                <p id="auth-error-message" style="color: red;"></p>
+            </form>
+        </section>
+    <section id="admin-content" style="display: none;">
         <div class="admin-header">
             <h1>Administrar Turnos</h1>
             <div class="admin-actions">
-                <button id="saveChangesBtn" class="admin-button">Guardar Cambios (Descargar JSON)</button>
-                <button id="resetChangesBtn" class="admin-button" style="background-color: #ffc107; color: #333;">Descartar Cambios</button>
-            </div>
+                <button id="save-changes-btn" class="admin-button">Guardar Cambios en Firestore</button>
+                </div>
         </div>
 
         <div class="day-navigation">
@@ -130,11 +144,37 @@
             <button id="nextDayBtn">Próximo Día →</button>
         </div>
 
-        <div id="admin-turnos-container">
+        <div id="turnos-admin-container">
             </div>
+    </section>
     </main>
 
+    <script type="module">
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOfMJN3GXxXfAzqycARBSV2G2FTkp7TA8",
+            authDomain: "babson-padel.firebaseapp.com",
+            projectId: "babson-padel",
+            storageBucket: "babson-padel.firebasestorage.app",
+            messagingSenderId: "26362855377",
+            appId: "1:26362855377:web:97ca4d59e5afb92cca6af0"
+        };
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        // Importamos todas las funciones necesarias de Firestore
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"; 
+        // Importamos todas las funciones necesarias de Authentication
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"; 
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Hacemos las instancias y funciones clave globales para admin-script.js
+        window.db = db;
+        window.auth = auth;
+        window.firebaseFirestore = { collection, query, where, getDocs, doc, updateDoc }; 
+        window.firebaseAuth = { signInWithEmailAndPassword, signOut, onAuthStateChanged }; 
+    </script>
     <script src="admin-script.js"></script>
 </body>
 </html>
-
