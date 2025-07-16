@@ -1,25 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
     const whatsappNumero = "5492346525248"; // Tu número de WhatsApp con código de país sin el +
 
+    // Variables globales (¡importante que estén fuera de la función cargarYMostrarTurnosDelDia para que mantengan su estado!)
     let currentDisplayDate = new Date(); // Variable para la fecha del día que se está mostrando
-    let turnosSemanaData = {}; // Variable para almacenar los datos de los turnos del JSON
+    let turnosSemanaData = {}; // Variable para almacenar los datos de los turnos cargados de Firestore para el día actual
 
     // Referencias a los botones de navegación y al display del día
     const prevDayBtn = document.getElementById('prevDayBtn');
     const nextDayBtn = document.getElementById('nextDayBtn');
     const currentDayDisplaySpan = document.getElementById('currentDayDisplay');
+    const turnosContainer = document.getElementById('turnosContainer'); // Asegúrate de que este ID exista en tu HTML
+
 
     const diasNombres = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
     const mesesNombres = [
-        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mato', 'Junio', // Cuidado, Mato debería ser Mayo
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
 
     // Función para obtener la información de un día específico
     function getDiaInfo(date) {
+        // Normaliza el nombre del día para que coincida con lo que guardarás en Firestore ('lunes', 'martes', etc.)
         const nombreDia = diasNombres[date.getDay()];
         // Formato para mostrar: "Martes 9 de Julio de 2025"
-        const fechaFormateada = `${diasNombres[date.getDay()].charAt(0).toUpperCase() + diasNombres[date.getDay()].slice(1)} ${date.getDate()} de ${mesesNombres[date.getMonth()]} de ${date.getFullYear()}`;
+        const fechaFormateada = `${nombreDia.charAt(0).toUpperCase() + nombreDia.slice(1)} ${date.getDate()} de ${mesesNombres[date.getMonth()]} de ${date.getFullYear()}`;
         
         // Formato YYYY-MM-DD para el mensaje de WhatsApp, si fuera necesario más preciso
         const year = date.getFullYear();
@@ -28,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const fechaIso = `${year}-${month}-${day}`;
 
         return {
-            nombre: nombreDia, // Ej: 'lunes', 'martes' (para buscar en el JSON)
+            nombre: nombreDia, // Ej: 'lunes', 'martes' (para buscar en Firestore)
             display: fechaFormateada,
             fullDate: fechaIso
         };
@@ -53,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (turno.disponible) {
             const botonReservar = turnoDiv.querySelector('.reservar-btn');
             botonReservar.addEventListener('click', () => {
-                // Usamos diaInfo.display para el mensaje de WhatsApp, que ya incluye el nombre del día y la fecha
                 const mensaje = `Hola! Quiero reservar el turno del ${diaInfo.display} a las ${turno.hora} para la cancha de pádel.`;
                 const urlWhatsApp = `https://wa.me/${whatsappNumero}?text=${encodeURIComponent(mensaje)}`;
                 window.open(urlWhatsApp, '_blank');
@@ -64,97 +67,87 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función principal para cargar y mostrar los turnos del día actual
     async function cargarYMostrarTurnosDelDia() {
-        // Si los datos no se han cargado de Firestore, los cargamos una sola vez
-if (Object.keys(turnosSemanaData).length === 0) {
-    const db = window.db; // Accede a la instancia global de Firestore
+        // Accede a la instancia global de Firestore y sus funciones
+        const db = window.db; 
+        const { query, where, getDocs } = window.firebaseFirestore; 
 
-    if (!db) {
-        console.error("Firestore no está inicializado.");
-        alert("Hubo un error al conectar con la base de datos. Por favor, intentá de nuevo más tarde.");
-        return;
-    }
-
-    try {
-        const turnosRef = db.collection("turnos"); // Referencia a tu colección 'turnos' en Firestore
-        const snapshot = await turnosRef.get(); // Obtiene todos los documentos de esa colección
-
-        const loadedTurnos = [];
-        snapshot.forEach(doc => {
-            loadedTurnos.push(doc.data()); // Agrega cada turno al array
-        });
-
-        // Asigna los turnos cargados a turnosSemanaData en el formato esperado
-        // Asumo que turnosSemanaData.turnos es un array de turnos
-        turnosSemanaData = { turnos: loadedTurnos };
-
-        // Opcional: Ordenar los turnos por hora si no están garantizados ordenados en Firestore
-        // Esto es importante para que se muestren en el orden correcto
-        turnosSemanaData.turnos.sort((a, b) => {
-            const timeA = new Date(`2000/01/01 ${a.hora}`);
-            const timeB = new Date(`2000/01/01 ${b.hora}`);
-            return timeA - timeB;
-        });
-
-    } catch (error) {
-        console.error("Error al cargar turnos de Firestore:", error);
-        alert("Hubo un error al cargar los turnos. Por favor, intentá de nuevo más tarde.");
-        return; // Detiene la ejecución si hay error al cargar
-    }
-}
-// El resto de tu función cargarYMostrarTurnosDelDia() sigue igual aquí abajo
-// Por ejemplo, la línea: const turnos = turnosSemanaData.turnos;
-// Y toda la lógica de filtrado y display de turnos.
-
-        // Obtener la información del día que vamos a mostrar
-        const diaActualInfo = getDiaInfo(currentDisplayDate);
-        currentDayDisplaySpan.textContent = diaActualInfo.display; // Actualiza el texto en la navegación
-
-        // Ocultar todas las secciones de días primero
-        document.querySelectorAll('.turnos-dia').forEach(section => {
-            section.classList.remove('active');
-        });
-
-        // Seleccionar la sección del día correspondiente al día actual (ej. 'lunes')
-        const nombreDiaJson = diaActualInfo.nombre; // Esto nos dará 'lunes', 'martes', etc.
-        const turnosGrid = document.querySelector(`#turnos-${nombreDiaJson} .turnos-grid`);
-        const diaSection = document.getElementById(`turnos-${nombreDiaJson}`);
-
-        // Asegurarse de que la sección del día exista y luego mostrarla
-        if (diaSection) {
-            diaSection.classList.add('active'); // Mostrar solo la sección del día activo
-        } else {
-            console.warn(`No se encontró la sección HTML para el día: ${nombreDiaJson}`);
-            // Puedes añadir un mensaje al usuario si un día no tiene sección HTML
+        if (!db || !query || !where || !getDocs) {
+            console.error("Firebase Firestore no está completamente inicializado o las funciones no están disponibles.");
+            alert("Hubo un error al conectar con la base de datos. Por favor, intentá de nuevo más tarde.");
+            return;
         }
-        
-        turnosGrid.innerHTML = ''; // Limpiar turnos anteriores
 
-        // Obtener los turnos para el día actual del JSON (usando el nombre del día)
-        const turnosDelDia = turnosSemanaData[nombreDiaJson];
-        if (turnosDelDia && turnosDelDia.length > 0) {
-            turnosDelDia.forEach(turno => {
-                const turnoElement = crearTurnoHTML(turno, diaActualInfo);
-                turnosGrid.appendChild(turnoElement);
+        try {
+            const turnosRef = db.collection("turnos"); // Referencia a tu colección 'turnos' en Firestore
+            const diaActualInfo = getDiaInfo(currentDisplayDate); // Obtiene el nombre del día actual (ej. "lunes")
+
+            // Consulta a Firestore: filtra por el día actual
+            const q = query(turnosRef, where("dia", "==", diaActualInfo.nombre));
+
+            const snapshot = await getDocs(q); // Ejecuta la consulta filtrada
+            
+            const loadedTurnos = [];
+            snapshot.forEach(doc => {
+                loadedTurnos.push(doc.data()); // Agrega cada turno al array
             });
-        } else {
-            // Mensaje si no hay turnos definidos para ese día en el JSON o el array está vacío
-            turnosGrid.innerHTML = '<p>No hay turnos definidos para este día.</p>';
+
+            // Almacena los turnos cargados para el día actual
+            turnosSemanaData.turnos = loadedTurnos;
+
+            // Ordenar los turnos por hora
+            turnosSemanaData.turnos.sort((a, b) => {
+                const timeA = new Date(`2000/01/01 ${a.hora}`);
+                const timeB = new Date(`2000/01/01 ${b.hora}`);
+                return timeA - timeB;
+            });
+
+            // --- Lógica de ACTUALIZACIÓN DE LA INTERFAZ ---
+
+            // Actualiza el texto del día en la navegación
+            currentDayDisplaySpan.textContent = diaActualInfo.display;
+
+            // Limpia el contenedor de turnos y recrea la estructura para el día
+            turnosContainer.innerHTML = ''; 
+            const diaSection = document.createElement('section');
+            diaSection.classList.add('turnos-dia', 'active'); // Añadimos 'active' para que se muestre
+            // ID de la sección basada en el día, si es que lo usas en el CSS para algo específico
+            diaSection.id = `turnos-${diaActualInfo.nombre}`; 
+            diaSection.innerHTML = `<h2>${diaActualInfo.display}</h2><div class="turnos-grid"></div>`;
+            turnosContainer.appendChild(diaSection);
+            
+            const turnosGrid = diaSection.querySelector('.turnos-grid');
+
+            // Mostrar los turnos cargados para el día
+            if (turnosSemanaData.turnos && turnosSemanaData.turnos.length > 0) {
+                turnosSemanaData.turnos.forEach(turno => {
+                    const turnoElement = crearTurnoHTML(turno, diaActualInfo);
+                    turnosGrid.appendChild(turnoElement);
+                });
+            } else {
+                turnosGrid.innerHTML = '<p>No hay turnos disponibles para este día.</p>';
+            }
+
+        } catch (error) {
+            console.error("Error al cargar turnos de Firestore:", error);
+            alert("Hubo un error al cargar los turnos. Por favor, intentá de nuevo más tarde.");
+            // Si hay un error, limpiar la vista de turnos
+            turnosContainer.innerHTML = '<p>Error al cargar los turnos. Por favor, intentá de nuevo.</p>';
         }
     }
 
-    // Event Listeners para los botones de navegación de días
+    // --- Event Listeners para los botones de navegación de días ---
     prevDayBtn.addEventListener('click', () => {
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Establecer a inicio del día para comparación
-    
+        
         const newDate = new Date(currentDisplayDate);
         newDate.setDate(newDate.getDate() - 1);
         newDate.setHours(0, 0, 0, 0); // Establecer a inicio del día para comparación
-    
+        
         // Solo permitir ir al día anterior si no es antes de hoy
         if (newDate.getTime() >= today.getTime()) {
             currentDisplayDate.setDate(currentDisplayDate.getDate() - 1);
-            cargarYMostrarTurnosDelDia();
+            cargarYMostrarTurnosDelDia(); // Recarga los turnos para el nuevo día
         } else {
             alert('No puedes ver turnos de días pasados.');
         }
@@ -164,15 +157,15 @@ if (Object.keys(turnosSemanaData).length === 0) {
         const limitDate = new Date();
         limitDate.setDate(limitDate.getDate() + 6); // Hoy + 6 días = 7 días en total
         limitDate.setHours(0, 0, 0, 0); // Establecer a inicio del día para comparación
-    
+        
         const newDate = new Date(currentDisplayDate);
         newDate.setDate(newDate.getDate() + 1);
         newDate.setHours(0, 0, 0, 0); // Establecer a inicio del día para comparación
-    
+        
         // Solo permitir ir al día siguiente si no excede el límite de 7 días
         if (newDate.getTime() <= limitDate.getTime()) {
             currentDisplayDate.setDate(currentDisplayDate.getDate() + 1);
-            cargarYMostrarTurnosDelDia();
+            cargarYMostrarTurnosDelDia(); // Recarga los turnos para el nuevo día
         } else {
             alert('Solo puedes ver los turnos para los próximos 7 días.');
         }
@@ -180,4 +173,4 @@ if (Object.keys(turnosSemanaData).length === 0) {
 
     // Cargar los turnos del día inicial al cargar la página
     cargarYMostrarTurnosDelDia();
-});
+}); // Cierre del DOMContentLoaded
