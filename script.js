@@ -173,29 +173,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cargar los turnos del día inicial al cargar la página
     cargarYMostrarTurnosDelDia();
-    // --- INICIO CÓDIGO TEMPORAL PARA SUBIR TURNOS A FIRESTORE ---
+   // ... (resto de tu script.js hasta el final del DOMContentLoaded) ...
+
+// --- INICIO CÓDIGO TEMPORAL PARA SUBIR TURNOS A FIRESTORE ---
 // ESTE CÓDIGO SE DEBE QUITAR UNA VEZ QUE LOS TURNOS ESTÉN EN FIRESTORE
 
 async function addInitialTurnosToFirestore() {
-    // Solo ejecutamos esto si NO hay turnos en la base de datos para el día actual (lunes)
-    // Esto previene que se dupliquen si ya se ejecutó antes.
     try {
-        const { collection, query, where, getDocs, addDoc } = window.firebaseFirestore;
-        const db = window.db;
+        // Accede a la instancia global de Firestore
+        const db = window.db; 
 
-        if (!db) {
-            console.error("Firestore no está inicializado.");
+        // Desestructura las funciones necesarias de Firebase Firestore
+        // Asegúrate de que estas funciones existan antes de usarlas
+        const { collection, query, where, getDocs, addDoc } = window.firebaseFirestore || {}; 
+        // Agregamos `|| {}` para evitar un error si window.firebaseFirestore es undefined,
+        // aunque tu index.html debería garantizar que no lo sea.
+
+        if (!db || !collection || !query || !where || !getDocs || !addDoc) {
+            console.error("Firebase Firestore no está completamente inicializado o faltan funciones (collection, addDoc, etc.).");
+            alert("Error: No se pudo conectar a la base de datos de Firebase. Por favor, intentá de nuevo más tarde.");
             return;
         }
 
-        // Comprobamos si ya existen turnos para el lunes (o cualquier día que sepas que tiene turnos)
+        // Comprobamos si ya existen turnos para el lunes
         const turnosRef = collection(db, "turnos");
         const q = query(turnosRef, where("dia", "==", "lunes"));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
             console.log("Ya existen turnos en Firestore. No es necesario subir los datos iniciales.");
-            return; // Salimos de la función si ya hay turnos
+            return; 
         }
 
         console.log("No se encontraron turnos. Iniciando la subida de datos iniciales a Firestore...");
@@ -255,7 +262,7 @@ async function addInitialTurnosToFirestore() {
         for (const dia in turnosData) {
             if (turnosData.hasOwnProperty(dia)) {
                 for (const turno of turnosData[dia]) {
-                    await addDoc(collection(db, "turnos"), {
+                    await addDoc(collection(db, "turnos"), { // Usa addDoc con collection(db, ...)
                         dia: dia,
                         hora: turno.hora,
                         precio: turno.precio,
@@ -274,8 +281,11 @@ async function addInitialTurnosToFirestore() {
     }
 }
 
-// Llama a la función para subir los datos
-addInitialTurnosToFirestore();
+// Llama a la función para subir los datos con un pequeño retraso
+// ESTE setTimeout ES CRÍTICO
+setTimeout(() => {
+    addInitialTurnosToFirestore();
+}, 1500); // Aumentamos el retraso a 1.5 segundos por si acaso
 
 // --- FIN CÓDIGO TEMPORAL ---
 }); // Cierre del DOMContentLoaded
