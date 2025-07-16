@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function cargarYMostrarTurnosDelDia() {
         // Accede a la instancia global de Firestore y sus funciones
         const db = window.db; 
-        const { query, where, getDocs } = window.firebaseFirestore; 
+        const { collection, query, where, getDocs } = window.firebaseFirestore;
 
         if (!db || !query || !where || !getDocs) {
             console.error("Firebase Firestore no está completamente inicializado o las funciones no están disponibles.");
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const turnosRef = db.collection("turnos"); // Referencia a tu colección 'turnos' en Firestore
+            const turnosRef = collection(db, "turnos"); // Correcto: usa la función 'collection'
             const diaActualInfo = getDiaInfo(currentDisplayDate); // Obtiene el nombre del día actual (ej. "lunes")
 
             // Consulta a Firestore: filtra por el día actual
