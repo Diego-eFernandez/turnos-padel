@@ -178,7 +178,7 @@ function initializePageLogic() {
     // Cargar los turnos del día inicial al cargar la página
     cargarYMostrarTurnosDelDia();
     
-    addInitialTurnosToFirestore()
+    //addInitialTurnosToFirestore()
 
     async function addInitialTurnosToFirestore() {
         try {
