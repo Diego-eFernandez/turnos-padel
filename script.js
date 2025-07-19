@@ -31,7 +31,7 @@ window.initBabsonPadelApp = (appInstance, firestoreDbInstance) => {
 // Mueve todo el código de DOMContentLoaded a una nueva función
 // que se llamará una vez que Firebase esté listo.
 function initializePageLogic() {
-    const whatsappNumero = "5492346525248";
+    const whatsappNumero = "5492346658995";
 
     // Variables globales
     let currentDisplayDate = new Date();
